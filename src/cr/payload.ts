@@ -1,3 +1,5 @@
+import { UserPayload } from '../core/user';
+
 type StackTrace = Partial<{
     LineNumber: number;
     ColumnNumber: number;
@@ -48,14 +50,6 @@ type Request = {
     Headers: Headers;
 };
 
-type User = {
-    Identifier: string;
-    IsAnonymous: boolean;
-    Email: string;
-    FullName: string;
-    FirstName: string;
-};
-
 type Breadcrumb = {
     level: string;
     timestamp: number;
@@ -68,7 +62,7 @@ export type Payload = {
     Details: {
         Error: Error;
         Environment: Environment;
-        User: User;
+        User: UserPayload;
         Breadcrumbs?: Breadcrumb[];
         GroupingKey?: string;
         Client: {
