@@ -1,0 +1,17 @@
+{
+    "compilerOptions": {
+        "allowJs": false,
+        "build": true,
+        "removeComments": true,
+        "outDir": "./dist",
+        "strict": true,
+        "target": "es5",
+        "baseUrl": ".",
+    },
+    "include": [
+        "./src/raygun.ts"
+    ],
+    "exclude": [
+        "*.spec.ts"
+    ]
+}

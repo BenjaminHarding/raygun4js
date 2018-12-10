@@ -21,9 +21,15 @@
     }
   ],
   "devDependencies": {
-    
+    "typescript": "^3.2.2"
   },
   "dependencies": {},
+  "scripts": {
+    "build": "tsc",
+    "build:watch": "tsc -watch",
+    "test": "build",
+    "lint": ""
+  },
   "keywords": [
     "error",
     "tracking",
