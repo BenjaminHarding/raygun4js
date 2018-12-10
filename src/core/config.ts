@@ -1,5 +1,5 @@
 type RequiredConfig = {
-    apiUrl: boolean,
+    apiKey: string,
 };
 
 export type OptionalConfig = {
@@ -14,7 +14,6 @@ export type UserConfig = RequiredConfig & Partial<OptionalConfig>;
 
 export function assignDefaultConfig(userConfig: UserConfig): Config {
     return {
-        apiUrl: false,
         realUserMonitoring: false,
         crashReporting: false,
         secureCookie: true,
