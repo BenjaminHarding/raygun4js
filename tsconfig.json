@@ -3,10 +3,11 @@
         "allowJs": false,
         "build": true,
         "removeComments": true,
-        "outDir": "./dist",
+        "outFile": "./dist/raygun.js",
         "strict": true,
         "target": "es5",
         "baseUrl": ".",
+        "module": "amd"
     },
     "include": [
         "./src/raygun.ts"
