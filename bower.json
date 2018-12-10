@@ -9,7 +9,7 @@
     "type": "git",
     "url": "git://github.com/MindscapeHQ/raygun4js.git"
   },
-  "description": "Official Raygun.io automatic error tracking plugin for JavaScript",
+  "description": "Official Raygun.com automatic error tracking and real user monitoring plugin for JavaScript",
   "main": "dist/raygun.js",
   "keywords": [
     "error",
