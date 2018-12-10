@@ -10,7 +10,8 @@
     "testRegex": "(\\.|/)(spec)\\.ts$",
     "globals": {},
     "moduleFileExtensions": [
-      "ts"
+      "ts",
+      "js"
     ]
   }
   

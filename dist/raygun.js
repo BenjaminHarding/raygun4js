@@ -13,7 +13,7 @@ define("core/config", ["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     function assignDefaultConfig(userConfig) {
-        return __assign({ apiUrl: false, realUserMonitoring: false, crashReporting: false, secureCookie: true }, userConfig);
+        return __assign({ realUserMonitoring: false, crashReporting: false, secureCookie: true }, userConfig);
     }
     exports.assignDefaultConfig = assignDefaultConfig;
 });
