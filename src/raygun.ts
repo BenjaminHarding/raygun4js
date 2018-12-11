@@ -1,14 +1,17 @@
 import { Config, UserConfig, assignDefaultConfig } from './core/config';
-import { User, UserPayload, convertToPayload } from './core/user';
+import { UserInfo, UserPayload, User } from './core/user';
+
 
 export class Raygun {
     private config: Config;
 
-    private user: UserPayload;
+    private user: User;
 
     boot(userConfig: UserConfig): Raygun {
         this.config = assignDefaultConfig(userConfig);
-    
+
+        this.user = new User(this.config);
+
         if(this.config.crashReporting) {
             // Boot CR
         }
@@ -19,8 +22,8 @@ export class Raygun {
         return this;
     }
 
-    setUser(user: User) {
-        this.user = convertToPayload(user);
+    setUser(user: UserInfo) {
+        this.user.setUser(user);
         return this;
     }
 
