@@ -13,7 +13,7 @@ define("core/config", ["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     function assignDefaultConfig(userConfig) {
-        return __assign({ realUserMonitoring: false, crashReporting: false, secureCookie: true }, userConfig);
+        return __assign({ realUserMonitoring: false, crashReporting: false, secureCookie: true, saveOfflineErrors: false }, userConfig);
     }
     exports.assignDefaultConfig = assignDefaultConfig;
 });
@@ -53,13 +53,13 @@ define("utils/storage/cookie", ["require", "exports"], function (require, export
                     c = c.substring(1, c.length);
                 }
                 if (c.indexOf(nameEQ) === 0) {
-                    return c.substring(nameEQ.length, c.length);
+                    return JSON.parse(c.substring(nameEQ.length, c.length));
                 }
             }
             return null;
         };
         CookieStorage.prototype.clear = function (name) {
-            this.set(name, '', -1);
+            this.set(name, "", -1);
         };
         return CookieStorage;
     }());
@@ -106,7 +106,7 @@ define("utils/storage/localStorage", ["require", "exports", "utils/time"], funct
                 localStorage.removeItem(name);
                 return null;
             }
-            return item;
+            return item.data;
         };
         LocalStorage.prototype.clear = function (name) {
             localStorage.removeItem(name);
@@ -155,8 +155,16 @@ define("core/user", ["require", "exports", "utils/storage/index"], function (req
             this.config = config;
             this.storage = storage;
             this.storage.updateConfig(this.config);
-            this.user = this.storage.read(USER_KEY);
+            this.setUserFromStorage();
         }
+        User.prototype.setUserFromStorage = function () {
+            var identifier = this.storage.read(USER_KEY);
+            if (identifier) {
+                this.user = {
+                    identifier: identifier
+                };
+            }
+        };
         User.prototype.setUser = function (user) {
             this.user = convertToPayload(user);
             this.storage.set(USER_KEY, this.user.Identifier, USER_COOKIE_TIMEOUT);
@@ -184,10 +192,6 @@ define("core/tags", ["require", "exports"], function (require, exports) {
     }());
     exports.Tags = Tags;
 });
-define("cr/payload", ["require", "exports"], function (require, exports) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-});
 define("core/index", ["require", "exports", "core/config", "core/tags", "core/user"], function (require, exports, config_1, tags_1, user_1) {
     "use strict";
     function __export(m) {
@@ -198,29 +202,96 @@ define("core/index", ["require", "exports", "core/config", "core/tags", "core/us
     __export(tags_1);
     __export(user_1);
 });
+define("cr/payload", ["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+});
 define("cr/errorQueue", ["require", "exports", "utils/storage/index"], function (require, exports, index_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
+    var ERROR_STORAGE_KEY = "raygun4js-errors";
     var ErrorQueue = (function () {
         function ErrorQueue(config, storage) {
             if (storage === void 0) { storage = new index_2.LocalStorage(); }
+            this.errorQueue = [];
+            this.storage = storage;
+            this.config = config;
+            this.setQueueFromStorage();
         }
+        ErrorQueue.prototype.setQueueFromStorage = function () {
+            var _this = this;
+            if (!this.config.saveOfflineErrors) {
+                return;
+            }
+            var errors = this.storage.read(ERROR_STORAGE_KEY);
+            if (errors) {
+                this.errorQueue = errors.filter(function (e) { return e.apiKey === _this.config.apiKey; });
+            }
+        };
+        ErrorQueue.prototype.saveQueueToStorage = function () {
+            if (!this.config.saveOfflineErrors) {
+                return;
+            }
+            this.storage.set(ERROR_STORAGE_KEY, this.errorQueue);
+        };
+        ErrorQueue.prototype.add = function (error, addToStart) {
+            if (addToStart) {
+                this.errorQueue.unshift(error);
+            }
+            else {
+                this.errorQueue.push(error);
+            }
+            this.saveQueueToStorage();
+        };
+        ErrorQueue.prototype.length = function () {
+            return this.errorQueue.length;
+        };
+        ErrorQueue.prototype.removeAndGetFirstItem = function () {
+            var error = this.errorQueue.shift();
+            if (error) {
+                this.saveQueueToStorage();
+                return error;
+            }
+            return null;
+        };
         return ErrorQueue;
     }());
     exports.ErrorQueue = ErrorQueue;
 });
-define("cr/cr", ["require", "exports"], function (require, exports) {
+define("cr/cr", ["require", "exports", "cr/errorQueue"], function (require, exports, errorQueue_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var CR = (function () {
         function CR(config, user, tags) {
+            this.sending = false;
             this.config = config;
             this.user = user;
             this.tags = tags;
+            this.errorQueue = new errorQueue_1.ErrorQueue(this.config);
         }
         CR.prototype.send = function (ex, customData, tags) {
             if (!this.config.crashReporting) {
                 return;
+            }
+        };
+        CR.prototype.postNextError = function () {
+            if (this.sending) {
+                return;
+            }
+            this.sending = true;
+            var error = this.errorQueue.removeAndGetFirstItem();
+            if (!error) {
+                this.sending = false;
+                return;
+            }
+            var success = false;
+            if (success) {
+                this.sending = false;
+                this.postNextError();
+            }
+            else {
+                this.errorQueue.add(error, true);
+                this.sending = false;
             }
         };
         return CR;

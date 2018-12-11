@@ -1,8 +1,8 @@
 import { Config } from '../../core/config';
 
-export interface Storage {
+export interface Storage<D> {
     updateConfig(config: Config): void;
-    set: (name: string, value: any, hours?: number) => void;
-    read: (name: string) => any;
+    set: (name: string, value: D, hours?: number) => void;
+    read: (name: string) => D|null;
     clear: (name: string) => void;
 };

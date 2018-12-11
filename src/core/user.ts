@@ -49,19 +49,29 @@ const USER_KEY = "raygun4js-userid";
 const USER_COOKIE_TIMEOUT = 24 * 31; // One month cookie timeout
 
 export class User {
-    private storage: Storage;
+    private storage: Storage<string>;
 
     private config: Config;
 
     private user: UserPayload;
 
-    constructor(config: Config, storage: Storage=new CookieStorage()) {
+    constructor(config: Config, storage: Storage<string>=new CookieStorage()) {
         this.config = config;
         this.storage = storage;
         this.storage.updateConfig(this.config);
 
-        this.user = this.storage.read(USER_KEY);
+        this.setUserFromStorage();
     }
+
+    private setUserFromStorage() {
+        const identifier = this.storage.read(USER_KEY);
+
+        if(identifier) {
+            this.user = ({
+                identifier
+            } as any);
+        }
+    } 
 
     setUser(user: UserInfo) {
         this.user = convertToPayload(user);

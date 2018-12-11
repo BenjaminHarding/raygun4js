@@ -7,14 +7,14 @@ type LocalStorageItem = {
     data: any
 };
 
-export class LocalStorage implements Storage {
+export class LocalStorage<D> implements Storage<D> {
     config: Config;
 
     updateConfig(config: Config) {
         this.config = config;
     }
 
-    set(name: string, value: any, hours?: number) {
+    set(name: string, value: D, hours?: number) {
         const expiryTimestamp = !hours ? null : timestamp(hours);
 
         try {
@@ -27,7 +27,7 @@ export class LocalStorage implements Storage {
         }
     }
 
-    read(name: string) {
+    read(name: string):D|null {
         let item: LocalStorageItem | null = null;
 
         try {
@@ -45,7 +45,7 @@ export class LocalStorage implements Storage {
             return null;
         }
 
-        return item;
+        return item.data;
     }
 
     clear(name: string) {

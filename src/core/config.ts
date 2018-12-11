@@ -6,6 +6,7 @@ export type OptionalConfig = {
     crashReporting: boolean,
     realUserMonitoring: boolean,
     secureCookie: boolean,
+    saveOfflineErrors: boolean;
 };
 
 export type Config = RequiredConfig & OptionalConfig;
@@ -17,6 +18,7 @@ export function assignDefaultConfig(userConfig: UserConfig): Config {
         realUserMonitoring: false,
         crashReporting: false,
         secureCookie: true,
+        saveOfflineErrors: false,
         ...userConfig
     };
 }

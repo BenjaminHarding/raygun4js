@@ -1,14 +1,14 @@
 import { Config } from '../../core/config';
 import { Storage } from './storage';
 
-export class CookieStorage implements Storage {
+export class CookieStorage implements Storage<string> {
     config: Config;
 
     updateConfig(config: Config) {
         this.config = config;
     }
 
-    set(name: string, value: any, hours?: number) {
+    set(name: string, value: string, hours?: number) {
         let expires: string;
 
         if (!!hours) {
@@ -23,7 +23,7 @@ export class CookieStorage implements Storage {
         document.cookie = `${name}=${value}${expires}; path=/${secure}`;
     }
 
-    read(name: string) {
+    read(name: string): string|null {
         const nameEQ = `${name}=`;
         const ca = document.cookie.split(';');
 
@@ -41,6 +41,6 @@ export class CookieStorage implements Storage {
     }
 
     clear(name: string) {
-        this.set(name, '', -1);
+        this.set(name, "", -1);
     }
 }
