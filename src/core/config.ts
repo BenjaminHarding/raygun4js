@@ -1,12 +1,13 @@
 type RequiredConfig = {
-    apiKey: string,
+    apiKey: string;
 };
 
 export type OptionalConfig = {
-    crashReporting: boolean,
-    realUserMonitoring: boolean,
-    secureCookie: boolean,
+    crashReporting: boolean;
+    realUserMonitoring: boolean;
+    secureCookie: boolean;
     saveOfflineErrors: boolean;
+    apiUrl: string;
 };
 
 export type Config = RequiredConfig & OptionalConfig;
@@ -19,6 +20,7 @@ export function assignDefaultConfig(userConfig: UserConfig): Config {
         crashReporting: false,
         secureCookie: true,
         saveOfflineErrors: false,
+        apiUrl: "https://api.raygun.io",
         ...userConfig
     };
 }

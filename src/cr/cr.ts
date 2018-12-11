@@ -1,6 +1,7 @@
 import { Config, User, Tags } from '../core/index';
 import { CustomData } from './payload';
 import { ProcessedException, ErrorQueue } from './errorQueue';
+import { Transport, sendXHRRequest } from '../utils/transport/index';
 
 export class CR {
 
@@ -14,10 +15,13 @@ export class CR {
 
     private sending: boolean = false;
 
-    constructor(config: Config, user: User, tags: Tags) {
+    private transport: Transport;
+
+    constructor(config: Config, user: User, tags: Tags, transport: Transport = sendXHRRequest) {
         this.config = config;
         this.user = user;
         this.tags = tags;
+        this.transport = transport;
 
         this.errorQueue = new ErrorQueue(this.config);
     }
@@ -32,6 +36,10 @@ export class CR {
         // Add onto queue
     }
 
+    private get url():string {
+        return `${this.config.apiUrl}/entries?apikey=${encodeURIComponent(this.config.apiKey)}`;
+    }
+    
     private postNextError() {
         if(this.sending) {
             return;
@@ -45,14 +53,21 @@ export class CR {
             return;
         }
 
-        const success = false;
-        if(success) {
-            this.sending = false;
-            this.postNextError();
-        } else {
-            this.errorQueue.add(error, true);
-            this.sending = false;
-        }
+        this.transport({
+            method: 'post',
+            url: this.url,
+            data: error,
+            onSuccess: () => {
+                this.sending = false;
+                this.postNextError();
+            },
+            onFail: (retry?: boolean) => {
+                if(retry) {
+                    this.errorQueue.add(error, true);
+                }
+                this.sending = false;
+            }
+        });
     }
 
 }

@@ -24,5 +24,5 @@ export const sendXHRRequest: Transport = (options: TransportOptions) => {
         failTransport(options);
     };
 
-    xhr.send(options.data);
+    xhr.send(JSON.stringify(options.data);
 };

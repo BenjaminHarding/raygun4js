@@ -3,7 +3,7 @@ export const REQUEST_TIMEOUT = 10000;
 export type TransportOptions = {
     method: any;
     url: string;
-    data: any;
+    data: { [key:string]: any };
     onSuccess: () => void;
     onFail: (shouldRetry?: boolean) => void;
 };
