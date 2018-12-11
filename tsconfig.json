@@ -11,7 +11,7 @@
         "module": "amd"
     },
     "include": [
-        "./src/raygun.ts"
+        "./src/boot/raygun.ts"
     ],
     "exclude": [
         "*.spec.ts"

@@ -104,6 +104,7 @@ define("core/user", ["require", "exports", "utils/storage/index"], function (req
             this.config = config;
             this.storage = storage;
             this.storage.updateConfig(this.config);
+            this.user = this.storage.read(USER_KEY);
         }
         User.prototype.setUser = function (user) {
             this.user = convertToPayload(user);
@@ -116,7 +117,27 @@ define("core/user", ["require", "exports", "utils/storage/index"], function (req
     }());
     exports.User = User;
 });
-define("raygun", ["require", "exports", "core/config", "core/user"], function (require, exports, config_1, user_1) {
+define("core/tags", ["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var Tags = (function () {
+        function Tags() {
+        }
+        Tags.prototype.setTags = function (tags) {
+            this.tags = tags;
+        };
+        Tags.prototype.getTags = function () {
+            return this.tags.slice();
+        };
+        return Tags;
+    }());
+    exports.Tags = Tags;
+});
+define("boot/boot", ["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+});
+define("boot/raygun", ["require", "exports", "core/config", "core/user", "core/tags"], function (require, exports, config_1, user_1, tags_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var Raygun = (function () {
@@ -125,6 +146,7 @@ define("raygun", ["require", "exports", "core/config", "core/user"], function (r
         Raygun.prototype.boot = function (userConfig) {
             this.config = config_1.assignDefaultConfig(userConfig);
             this.user = new user_1.User(this.config);
+            this.tags = new tags_1.Tags();
             if (this.config.crashReporting) {
             }
             if (this.config.realUserMonitoring) {
@@ -133,6 +155,10 @@ define("raygun", ["require", "exports", "core/config", "core/user"], function (r
         };
         Raygun.prototype.setUser = function (user) {
             this.user.setUser(user);
+            return this;
+        };
+        Raygun.prototype.withTags = function (tags) {
+            this.tags.setTags(tags);
             return this;
         };
         Raygun.noConflict = function () {
