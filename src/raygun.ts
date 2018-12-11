@@ -1,11 +1,13 @@
 import { Config, UserConfig, assignDefaultConfig } from './core/config';
-import { UserInfo, UserPayload, User } from './core/user';
-
+import { UserInfo, User } from './core/user';
+import { Tags } from './core/tags';
 
 export class Raygun {
     private config: Config;
 
     private user: User;
+
+    private tags: Tags;
 
     boot(userConfig: UserConfig): Raygun {
         this.config = assignDefaultConfig(userConfig);
@@ -22,7 +24,7 @@ export class Raygun {
         return this;
     }
 
-    setUser(user: UserInfo) {
+    setUser(user: UserInfo): Raygun {
         this.user.setUser(user);
         return this;
     }
