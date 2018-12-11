@@ -53,7 +53,7 @@ define("utils/storage/cookie", ["require", "exports"], function (require, export
                     c = c.substring(1, c.length);
                 }
                 if (c.indexOf(nameEQ) === 0) {
-                    return JSON.parse(c.substring(nameEQ.length, c.length));
+                    return c.substring(nameEQ.length, c.length);
                 }
             }
             return null;
