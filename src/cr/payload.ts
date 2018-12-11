@@ -30,7 +30,7 @@ type Environment = {
     Platform: string;
 };
 
-type CustomData = {
+export type CustomData = {
     [key: string]: any;
 };
 

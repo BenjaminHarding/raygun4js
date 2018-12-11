@@ -2,14 +2,17 @@ import { Config, UserConfig, assignDefaultConfig } from '../core/config';
 import { UserInfo, User } from '../core/user';
 import { Tags } from '../core/tags';
 
-import { Boot } from './boot';
+import { CR } from '../cr/cr';
+import { Public } from './public';
 
-export class Raygun implements Boot<Raygun> {
+export class Raygun implements Public<Raygun> {
     private config: Config;
 
     private user: User;
 
     private tags: Tags;
+
+    private cr: CR;
 
     boot(userConfig: UserConfig) {
         this.config = assignDefaultConfig(userConfig);
@@ -17,14 +20,10 @@ export class Raygun implements Boot<Raygun> {
         this.user = new User(this.config);
         this.tags = new Tags();
 
-        if(this.config.crashReporting) {
-            // Boot CR
-        }
-        if(this.config.realUserMonitoring) {
-            // BOOT RUM
-        }
-
+        this.cr = new CR(this.config, this.user, this.tags);
         
+        // BOOT RUM
+
         return this;
     }
 

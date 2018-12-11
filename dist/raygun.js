@@ -65,13 +65,64 @@ define("utils/storage/cookie", ["require", "exports"], function (require, export
     }());
     exports.CookieStorage = CookieStorage;
 });
-define("utils/storage/index", ["require", "exports", "utils/storage/cookie"], function (require, exports, cookie_1) {
+define("utils/time", ["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    function timestamp(hours) {
+        return Date.now() + hours * 60 * 1000;
+    }
+    exports.timestamp = timestamp;
+});
+define("utils/storage/localStorage", ["require", "exports", "utils/time"], function (require, exports, time_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var LocalStorage = (function () {
+        function LocalStorage() {
+        }
+        LocalStorage.prototype.updateConfig = function (config) {
+            this.config = config;
+        };
+        LocalStorage.prototype.set = function (name, value, hours) {
+            var expiryTimestamp = !hours ? null : time_1.timestamp(hours);
+            try {
+                var item = { expiryTimestamp: expiryTimestamp, data: value };
+                var itemStringified = JSON.stringify(item);
+                localStorage.setItem(name, itemStringified);
+            }
+            catch (e) {
+            }
+        };
+        LocalStorage.prototype.read = function (name) {
+            var item = null;
+            try {
+                var val = localStorage.getItem(name);
+                if (!!val) {
+                    item = JSON.parse(val);
+                }
+            }
+            catch (e) {
+            }
+            if (!item || item && item.expiryTimestamp && time_1.timestamp(0) > item.expiryTimestamp) {
+                localStorage.removeItem(name);
+                return null;
+            }
+            return item;
+        };
+        LocalStorage.prototype.clear = function (name) {
+            localStorage.removeItem(name);
+        };
+        return LocalStorage;
+    }());
+    exports.LocalStorage = LocalStorage;
+});
+define("utils/storage/index", ["require", "exports", "utils/storage/cookie", "utils/storage/localStorage"], function (require, exports, cookie_1, localStorage_1) {
     "use strict";
     function __export(m) {
         for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
     }
     Object.defineProperty(exports, "__esModule", { value: true });
     __export(cookie_1);
+    __export(localStorage_1);
 });
 define("core/user", ["require", "exports", "utils/storage/index"], function (require, exports, index_1) {
     "use strict";
@@ -133,24 +184,64 @@ define("core/tags", ["require", "exports"], function (require, exports) {
     }());
     exports.Tags = Tags;
 });
-define("boot/boot", ["require", "exports"], function (require, exports) {
+define("cr/payload", ["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
 });
-define("boot/raygun", ["require", "exports", "core/config", "core/user", "core/tags"], function (require, exports, config_1, user_1, tags_1) {
+define("core/index", ["require", "exports", "core/config", "core/tags", "core/user"], function (require, exports, config_1, tags_1, user_1) {
+    "use strict";
+    function __export(m) {
+        for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
+    }
+    Object.defineProperty(exports, "__esModule", { value: true });
+    __export(config_1);
+    __export(tags_1);
+    __export(user_1);
+});
+define("cr/errorQueue", ["require", "exports", "utils/storage/index"], function (require, exports, index_2) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var ErrorQueue = (function () {
+        function ErrorQueue(config, storage) {
+            if (storage === void 0) { storage = new index_2.LocalStorage(); }
+        }
+        return ErrorQueue;
+    }());
+    exports.ErrorQueue = ErrorQueue;
+});
+define("cr/cr", ["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var CR = (function () {
+        function CR(config, user, tags) {
+            this.config = config;
+            this.user = user;
+            this.tags = tags;
+        }
+        CR.prototype.send = function (ex, customData, tags) {
+            if (!this.config.crashReporting) {
+                return;
+            }
+        };
+        return CR;
+    }());
+    exports.CR = CR;
+});
+define("boot/public", ["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+});
+define("boot/raygun", ["require", "exports", "core/config", "core/user", "core/tags", "cr/cr"], function (require, exports, config_2, user_2, tags_2, cr_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var Raygun = (function () {
         function Raygun() {
         }
         Raygun.prototype.boot = function (userConfig) {
-            this.config = config_1.assignDefaultConfig(userConfig);
-            this.user = new user_1.User(this.config);
-            this.tags = new tags_1.Tags();
-            if (this.config.crashReporting) {
-            }
-            if (this.config.realUserMonitoring) {
-            }
+            this.config = config_2.assignDefaultConfig(userConfig);
+            this.user = new user_2.User(this.config);
+            this.tags = new tags_2.Tags();
+            this.cr = new cr_1.CR(this.config, this.user, this.tags);
             return this;
         };
         Raygun.prototype.setUser = function (user) {
