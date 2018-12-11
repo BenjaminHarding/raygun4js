@@ -49,9 +49,13 @@ describe("User", () => {
             apiKey: "123",
         });
 
-        beforeAll(() => {
+        beforeEach(() => {
             storage = new MockStorage();
             user = new User(config, storage);
+        });
+
+        it("reads storage to get user identifier on boot", () => {
+            expect(storage.readMock.mock.calls.length).toBe(1);
         });
 
         it("setUser saves user value to storage", () => {

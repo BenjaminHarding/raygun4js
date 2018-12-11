@@ -59,6 +59,8 @@ export class User {
         this.config = config;
         this.storage = storage;
         this.storage.updateConfig(this.config);
+
+        this.user = this.storage.read(USER_KEY);
     }
 
     setUser(user: UserInfo) {
