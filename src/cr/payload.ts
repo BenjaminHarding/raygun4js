@@ -1,6 +1,6 @@
 import { UserPayload } from '../core/user';
 
-type StackTrace = Partial<{
+export type StackTrace = Partial<{
     LineNumber: number;
     ColumnNumber: number;
     ClassName: string;
@@ -8,14 +8,14 @@ type StackTrace = Partial<{
     MethodName: string;
 }>;
 
-type Error = {
+export type Error = {
     ClassName: string;
     Message: string;
     StackTrace: StackTrace[];
     StackString: string;
 };
 
-type Environment = {
+export type Environment = {
     UtcOffset: number;
     'User-Language': string;
     'Document-Mode': string;
@@ -44,7 +44,7 @@ type Headers = {
     Host: string;
 };
 
-type Request = {
+export type Request = {
     Url: string;
     QueryString: QueryString;
     Headers: Headers;

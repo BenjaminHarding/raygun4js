@@ -4,6 +4,7 @@ import { Transport, sendXHRRequest } from '../utils/transport';
 import { CustomData } from './payload';
 import { ProcessedException, ErrorQueue } from './errorQueue';
 import { discardError } from './discardError';
+import { createPayload } from './createPayload';
 import { TraceKit, TraceKitException } from './tracekit';
 
 export class CR {
@@ -51,7 +52,7 @@ export class CR {
             return;
         }
 
-        
+        const payload = createPayload(this.core, ex);
     }   
 
     private get url():string {

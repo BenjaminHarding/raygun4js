@@ -22,8 +22,9 @@ interface TraceKitException {
     name: string;
     message: string;
     url: string;
-    stack: TraceKitStack;
+    stack: TraceKitStack[];
     useragent: string;
+    stackString: string;
     incomplete?: boolean;
 };
 
@@ -1185,4 +1186,4 @@ TraceKit.extendToAsynchronousCallbacks = function () {
     _helper('setInterval');
 };
 
-export { TraceKit, TraceKitException };
+export { TraceKit, TraceKitException, TraceKitStack };

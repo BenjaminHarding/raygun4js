@@ -1,48 +1,106 @@
-import { Core, Config } from '../core';
-import { TraceKitException } from './tracekit';
-import { Payload } from './payload';
+import { Core, Config } from '../core/index';
+import { TraceKitException, TraceKitStack } from './tracekit';
+import { Payload, Environment, Request, CustomData, Error, StackTrace } from './payload';
+import { getQuery } from '../utils/url';
 
-export function createPayload(core: Core, exception: TraceKitException): Payload | null {
-    const shouldIgnore = errorChecks.every(check => check(core.config, exception))
+const CLIENT_NAME = 'raygun-js';
 
-    if(shouldIgnore) {
-        return null;
+const CLIENT_VERSION = 'test';
+
+export function createPayload(core: Core, exception: TraceKitException, tags: string[] = [], customData: CustomData = {}): Payload {
+    const payload: Payload = {
+        OccurredOn: new Date(),
+        Details: {
+            Error: createError(exception),
+            Environment: createEnvironment(),
+            User: core.user.getUser(),
+            Client: {
+                Name: CLIENT_NAME,
+                Version: CLIENT_VERSION,
+            },
+            UserCustomData: createCustomData(customData),
+            Tags: [ ...core.tags.getTags(), ...tags ],
+            Request: createRequest(),
+            Version: 'Not supplied',
+        }
+    };
+
+    // Breadcrumbs
+    // GroupingKey
+
+    return payload;
+}
+
+export function createStackTrace(stack: TraceKitStack[]): StackTrace[] {
+    if(!stack || !stack.length) {
+        return [];
     }
 
-
+    return stack.map<StackTrace>((frame) => ({
+        LineNumber: frame.line,
+        ColumnNumber: frame.column,
+        ClassName: `line ${frame.line}, column ${frame.column}`,
+        FileName: frame.url,
+        MethodName: frame.func || '[anonymous]'
+    }));
 }
 
-// true = error is allowed through
-// false =  error shouldn't be reported
-type ErrorCheck = (config: Config, exception: TraceKitException) => boolean;
-
-export const isNotThirdPartyError: ErrorCheck = (config, exception) => {
-    if(!config.ignore3rdPartyErrors) {
-        return true;
+export function createMessage(exception: TraceKitException): string {
+    if(exception.message) {
+        return exception.message;
     }
-    // TODO
-    return false;
+    // status? 
+    // raw error?
+    // custom message?
+    
+    return "Script error";
 }
 
-export const isNotAnExcludedHostname: ErrorCheck = (config, exception) => {
-    // TODO
-    // config.excludedHostnames
-    return true;
+export function createError(exception: TraceKitException):Error {
+    return {
+        ClassName: exception.name,
+        Message: createMessage(exception).substring(0, 512),
+        StackTrace: createStackTrace(exception.stack),
+        StackString: exception.stackString
+    };
 }
 
-export const isNotAnExcludedUserAgent: ErrorCheck = (config, exception) => {
-    // TODO
-    // config.excludedUserAgents
-    return true;
+export function createCustomData(customData: CustomData): CustomData {
+    try {
+        JSON.stringify(customData);
+    } catch(e) {
+        return {
+            error: 'Cannot add custom data; may contain circular reference',
+        };
+    }
+    return customData;
 }
 
-export const isNotTheInsightsCrawler: ErrorCheck = () => {
-    return !navigator.userAgent.match('RaygunPulseInsightsCrawler');
+export function createRequest(): Request {
+    return {
+        Url: `${window.location.protocol}//${window.location.host}${window.location.pathname}${window.location.hash}`,
+        QueryString: getQuery(),
+        Headers: {
+            'User-Agent': navigator.userAgent,
+            Referer: document.referrer,
+            Host: document.domain
+        },
+    };
 }
 
-const errorChecks: ErrorCheck[] = [
-    isNotThirdPartyError,
-    isNotAnExcludedHostname,
-    isNotAnExcludedUserAgent,
-    isNotTheInsightsCrawler,
-];
+export function createEnvironment(): Environment {
+    return {
+        UtcOffset: new Date().getTimezoneOffset() / -60.0,
+        'User-Language': (window.navigator as any).userLanguage, 
+        'Document-Mode': (document as any).documentMode, 
+        'Browser-Width': window.innerWidth || document.documentElement.clientWidth,
+        'Browser-Height': window.innerHeight || document.documentElement.clientHeight,
+        'Screen-Width': screen ? window.screen.width : document.documentElement.clientWidth,
+        'Screen-Height': screen ? window.screen.height : document.documentElement.clientHeight,
+        'Color-Depth': screen ? window.screen.colorDepth : 8,
+        Browser: navigator.appCodeName,
+        'Browser-Name': navigator.appName,
+        'Browser-Version': navigator.appVersion,
+        Platform: navigator.platform,
+    };
+}
