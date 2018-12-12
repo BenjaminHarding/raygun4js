@@ -1,5 +1,5 @@
-import { Config } from '../core/index';
-import { Storage, LocalStorage } from '../utils/storage/index';
+import { Config } from '../core';
+import { Storage, LocalStorage } from '../utils/storage';
 import { Payload } from './models';
 
 export type ProcessedException = {

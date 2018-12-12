@@ -3,11 +3,13 @@
         "allowJs": false,
         "build": true,
         "removeComments": true,
-        "strict": false,
+        //"noImplicitAny": true, // Need to fix tracekit file before we can enable this setting
         "strictPropertyInitialization": false,
         "target": "es5",
-        "baseUrl": ".",
-        "module": "es2015"
+        "outDir": "./dist/",
+        "module": "es2015",
+        "allowSyntheticDefaultImports": true,
+        "sourceMap": true,
     },
     "include": [
         "./src/boot/raygun.ts"

@@ -1,4 +1,4 @@
-import { UserConfig, UserInfo } from '../core/index';
+import { UserConfig, UserInfo } from '../core';
 
 export interface Public<T> {
     boot(userConfig: UserConfig): T;

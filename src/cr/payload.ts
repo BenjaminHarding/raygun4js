@@ -1,4 +1,4 @@
-import { Core, Config } from '../core/index';
+import { Core, Config } from '../core';
 import { TraceKitException, TraceKitStack } from './tracekit';
 import { Payload, Environment, Request, CustomData, Error, StackTrace } from './models';
 import { getQuery } from '../utils/url';

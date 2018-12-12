@@ -81,20 +81,20 @@
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = "./src/boot/raygun.ts");
+/******/ 	return __webpack_require__(__webpack_require__.s = "./src/boot/cr.ts");
 /******/ })
 /************************************************************************/
 /******/ ({
 
-/***/ "./src/boot/raygun.ts":
-/*!****************************!*\
-  !*** ./src/boot/raygun.ts ***!
-  \****************************/
-/*! exports provided: Raygun */
+/***/ "./src/boot/cr.ts":
+/*!************************!*\
+  !*** ./src/boot/cr.ts ***!
+  \************************/
+/*! exports provided: CrashReporting */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"Raygun\", function() { return Raygun; });\n/* harmony import */ var _core_index__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../core/index */ \"./src/core/index.ts\");\n/* harmony import */ var _cr_index__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../cr/index */ \"./src/cr/index.ts\");\n\n\nvar Raygun = (function () {\n    function Raygun() {\n        this.core = new _core_index__WEBPACK_IMPORTED_MODULE_0__[\"Core\"]();\n    }\n    Raygun.prototype.boot = function (userConfig) {\n        this.core.init(userConfig);\n        this.cr = new _cr_index__WEBPACK_IMPORTED_MODULE_1__[\"CR\"](this.core);\n        return this;\n    };\n    Raygun.prototype.setUser = function (user) {\n        this.core.user.setUser(user);\n        return this;\n    };\n    Raygun.prototype.withTags = function (tags) {\n        this.core.tags.setTags(tags);\n        return this;\n    };\n    Raygun.prototype.send = function (error, customData, tags) {\n        if (customData === void 0) { customData = {}; }\n        if (tags === void 0) { tags = []; }\n        this.cr.send(error, customData, tags);\n    };\n    Raygun.noConflict = function () {\n        return new Raygun();\n    };\n    return Raygun;\n}());\n\n\n\n//# sourceURL=webpack:///./src/boot/raygun.ts?");
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"CrashReporting\", function() { return CrashReporting; });\n/* harmony import */ var _core__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../core */ \"./src/core/index.ts\");\n/* harmony import */ var _cr__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../cr */ \"./src/cr/index.ts\");\n\n\nvar CrashReporting = (function () {\n    function CrashReporting() {\n        this.core = new _core__WEBPACK_IMPORTED_MODULE_0__[\"Core\"]();\n    }\n    CrashReporting.prototype.boot = function (userConfig) {\n        this.core.init(userConfig);\n        this.cr = new _cr__WEBPACK_IMPORTED_MODULE_1__[\"CR\"](this.core);\n        return this;\n    };\n    CrashReporting.prototype.setUser = function (user) {\n        this.core.user.setUser(user);\n        return this;\n    };\n    CrashReporting.prototype.withTags = function (tags) {\n        this.core.tags.setTags(tags);\n        return this;\n    };\n    CrashReporting.prototype.send = function (error, customData, tags) {\n        if (customData === void 0) { customData = {}; }\n        if (tags === void 0) { tags = []; }\n        this.cr.send(error, customData, tags);\n    };\n    CrashReporting.noConflict = function () {\n        return new CrashReporting();\n    };\n    return CrashReporting;\n}());\n\n\n\n//# sourceURL=webpack:///./src/boot/cr.ts?");
 
 /***/ }),
 
