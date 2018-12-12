@@ -22,6 +22,12 @@ describe("Config", () => {
                 realUserMonitoring: true,
                 crashReporting: true,
                 secureCookie: true,
+                saveOfflineErrors: true,
+                asyncErrorHandler: true,
+                ignore3rdPartyErrors: true,
+                excludedHostnames: ['123'],
+                excludedUserAgents: ['abc'],
+                apiUrl: "https://api.raygun.com",
                 apiKey
             };
 

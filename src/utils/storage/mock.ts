@@ -1,7 +1,7 @@
 import { Storage } from './storage';
 import { Config } from '../../core/config';
 
-export class MockStorage implements Storage {
+export class MockStorage<D> implements Storage<D> {
     private config: Config;
 
     public values: { [key:string]: any } = {};
@@ -11,13 +11,13 @@ export class MockStorage implements Storage {
     public clearMock: jest.Mock;    
 
     constructor() {
-        this.setMock = jest.fn((name: string, value: any, hours?:number) => {
+        this.setMock = jest.fn((name: string, value: D, hours?:number) => {
             this.values[name] = value;
         });
-        this.readMock = jest.fn((name: string, value: any, hours?:number) => {
+        this.readMock = jest.fn((name: string, value: D, hours?:number) => {
             return this.values[name];
         });
-        this.clearMock = jest.fn((name: string, value: any, hours?:number) => {
+        this.clearMock = jest.fn((name: string, value: D, hours?:number) => {
             this.values[name] = null;
         });
     }
@@ -26,7 +26,7 @@ export class MockStorage implements Storage {
         this.config = config;
     }
 
-    set(name: string, value: any, hours?: number) {
+    set(name: string, value: D, hours?: number) {
         return this.setMock(name, value, hours);
     }
 

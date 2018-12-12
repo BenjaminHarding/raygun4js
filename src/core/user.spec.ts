@@ -43,14 +43,14 @@ describe("User", () => {
 
     describe("User", () => {
         let user: User;
-        let storage: MockStorage;
+        let storage: MockStorage<string>;
 
         const config = assignDefaultConfig({
             apiKey: "123",
         });
 
         beforeEach(() => {
-            storage = new MockStorage();
+            storage = new MockStorage<string>();
             user = new User(config, storage);
         });
 

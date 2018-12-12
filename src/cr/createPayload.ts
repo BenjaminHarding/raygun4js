@@ -1,8 +1,8 @@
 import { Core, Config } from '../core';
-import { TracekitException } from './tracekit';
+import { TraceKitException } from './tracekit';
 import { Payload } from './payload';
 
-export function createPayload(core: Core, exception: TracekitException): Payload | null {
+export function createPayload(core: Core, exception: TraceKitException): Payload | null {
     const shouldIgnore = errorChecks.every(check => check(core.config, exception))
 
     if(shouldIgnore) {
@@ -14,7 +14,7 @@ export function createPayload(core: Core, exception: TracekitException): Payload
 
 // true = error is allowed through
 // false =  error shouldn't be reported
-type ErrorCheck = (config: Config, exception: TracekitException) => boolean;
+type ErrorCheck = (config: Config, exception: TraceKitException) => boolean;
 
 export const isNotThirdPartyError: ErrorCheck = (config, exception) => {
     if(!config.ignore3rdPartyErrors) {

@@ -1022,8 +1022,8 @@ TraceKit.computeStackTrace = (function computeStackTraceWrapper() {
                 'column': null
             };
 
-            if (curr.name) {
-                item.func = curr.name;
+            if ((curr as any).name) {
+                item.func = (curr as any).name;
             } else if ((parts = functionName.exec(curr.toString()))) {
                 item.func = parts[1];
             }
