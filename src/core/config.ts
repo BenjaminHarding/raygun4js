@@ -12,6 +12,7 @@ export type OptionalConfig = {
     ignore3rdPartyErrors: boolean;
     excludedHostnames: string[];
     excludedUserAgents: string[];
+    attachHandlers: boolean;
 };
 
 export type Config = RequiredConfig & OptionalConfig;
@@ -29,6 +30,7 @@ export function assignDefaultConfig(userConfig: UserConfig): Config {
         excludedHostnames: [],
         excludedUserAgents: [],
         apiUrl: "https://api.raygun.io",
+        attachHandlers: true,
         ...userConfig
     };
 }

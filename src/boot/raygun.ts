@@ -16,10 +16,13 @@ export class Raygun implements Public<Raygun> {
 
     boot(userConfig: UserConfig) {
         this.core.init(userConfig);
-
         this.cr = new CR(this.core);
         
         // BOOT RUM
+
+        if(this.core.config.attachHandlers) {
+            this.attachHandlers();
+        }
 
         return this;
     }
@@ -36,6 +39,16 @@ export class Raygun implements Public<Raygun> {
 
     send(error: Error, customData: CustomData={}, tags: string[]=[]) {
         this.cr.send(error, customData, tags);
+        return this;
+    }
+
+    attachHandlers() {
+        this.cr.attach();
+        return this;
+    }
+
+    detachHandlers() {
+        this.cr.detach();
         return this;
     }
 

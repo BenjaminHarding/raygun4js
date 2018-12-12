@@ -17,6 +17,11 @@ export class RaygunCrashReporting implements Public<RaygunCrashReporting> {
     boot(userConfig: UserConfig) {
         this.core.init(userConfig);
         this.cr = new CR(this.core);
+
+        if(this.core.config.attachHandlers) {
+            this.attachHandlers();
+        }
+
         return this;
     }
 
@@ -32,6 +37,16 @@ export class RaygunCrashReporting implements Public<RaygunCrashReporting> {
 
     send(error: Error, customData: CustomData={}, tags: string[]=[]) {
         this.cr.send(error, customData, tags);
+    }
+
+    attachHandlers() {
+        this.cr.attach();
+        return this;
+    }
+
+    detachHandlers() {
+        this.cr.detach();
+        return this;
     }
 
     static noConflict() {
