@@ -21,10 +21,12 @@ describe("Config", () => {
             const config: Config = {
                 realUserMonitoring: true,
                 crashReporting: true,
+                attachHandlers: false,
                 secureCookie: true,
                 saveOfflineErrors: true,
                 asyncErrorHandler: true,
                 ignore3rdPartyErrors: true,
+                captureUnhandledRejections: false,
                 excludedHostnames: ['123'],
                 excludedUserAgents: ['abc'],
                 apiUrl: "https://api.raygun.com",

@@ -1,7 +1,6 @@
 export type QueryMapping = { [key:string]: string };
 
-export function getQuery(): QueryMapping {
-    const location = window.location.toString();
+export function getQuery(location:string = window.location.toString()): QueryMapping {
     const query = (location.split('?')[1] || '').split('#')[0];
 
     const qs: QueryMapping = {};
