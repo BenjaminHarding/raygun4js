@@ -9,6 +9,9 @@ export type OptionalConfig = {
     saveOfflineErrors: boolean;
     apiUrl: string;
     asyncErrorHandler: boolean;
+    ignore3rdPartyErrors: boolean;
+    excludedHostnames: string[];
+    excludedUserAgents: string[];
 };
 
 export type Config = RequiredConfig & OptionalConfig;
@@ -22,6 +25,9 @@ export function assignDefaultConfig(userConfig: UserConfig): Config {
         secureCookie: true,
         saveOfflineErrors: false,
         asyncErrorHandler: false,
+        ignore3rdPartyErrors: false,
+        excludedHostnames: [],
+        excludedUserAgents: [],
         apiUrl: "https://api.raygun.io",
         ...userConfig
     };

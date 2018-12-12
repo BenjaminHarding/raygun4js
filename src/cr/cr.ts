@@ -1,16 +1,14 @@
-import { Config, User, Tags } from '../core/index';
+import { Core } from '../core/index';
+import { Transport, sendXHRRequest } from '../utils/transport';
+
 import { CustomData } from './payload';
 import { ProcessedException, ErrorQueue } from './errorQueue';
-import { Transport, sendXHRRequest } from '../utils/transport/index';
-import { TraceKit } from './tracekit';
+import { discardError } from './discardError';
+import { TraceKit, TraceKitException } from './tracekit';
 
 export class CR {
 
-    private config: Config;
-
-    private user: User;
-
-    private tags: Tags;
+    private core: Core;
 
     private errorQueue: ErrorQueue;
 
@@ -18,45 +16,46 @@ export class CR {
 
     private transport: Transport;
 
-    constructor(config: Config, user: User, tags: Tags, transport: Transport = sendXHRRequest) {
-        this.config = config;
-        this.user = user;
-        this.tags = tags;
+    constructor(core: Core, transport: Transport = sendXHRRequest) {
+        this.core = core;
         this.transport = transport;
 
-        this.errorQueue = new ErrorQueue(this.config);
-        this.onWindowError = this.onWindowError.bind(this);
+        this.errorQueue = new ErrorQueue(this.core.config);
+        this.processException = this.processException.bind(this);
     }
 
     public attach() {        
-        TraceKit.report.subscribe(this.onWindowError); // Attach global onerror handler
+        TraceKit.report.subscribe(this.processException); // Attach global onerror handler
 
-        if(this.config.asyncErrorHandler) {
+        if(this.core.config.asyncErrorHandler) {
             TraceKit.extendToAsynchronousCallbacks();
         }
     }
 
     public detach() {
-        TraceKit.report.unsubscribe(this.onWindowError);
+        TraceKit.report.unsubscribe(this.processException);
     }
 
     public send(ex: Error, customData: CustomData, tags: string[]) {
-        if(!this.config.crashReporting) {
+        if(!this.core.config.crashReporting) {
             return;
         }
 
         // Process stack
-        // Process remaining features/functionality
-        // Process 'onBeforeSend'
-        // Add onto queue
+        const exception = TraceKit.computeStackTrace(ex);
+        this.processException(exception, customData, tags);
     }
 
-    public onWindowError() {
+    private processException(ex: TraceKitException, customData: CustomData={}, tags: string[]=[]) {
+        if(discardError(this.core, ex)) {
+            return;
+        }
 
-    }
+        
+    }   
 
     private get url():string {
-        return `${this.config.apiUrl}/entries?apikey=${encodeURIComponent(this.config.apiKey)}`;
+        return `${this.core.config.apiUrl}/entries?apikey=${encodeURIComponent(this.core.config.apiKey)}`;
     }
     
     private postNextError() {

@@ -1,4 +1,4 @@
-import { Storage, CookieStorage } from '../utils/storage/index';
+import { Storage, CookieStorage } from '../utils/storage';
 import { Config } from './config';
 
 export type UserInfo = {

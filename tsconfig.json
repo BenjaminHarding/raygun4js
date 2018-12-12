@@ -3,12 +3,11 @@
         "allowJs": false,
         "build": true,
         "removeComments": true,
-        "outFile": "./dist/raygun.js",
-        "strict": true,
+        "strict": false,
         "strictPropertyInitialization": false,
         "target": "es5",
         "baseUrl": ".",
-        "module": "amd"
+        "module": "es2015"
     },
     "include": [
         "./src/boot/raygun.ts"

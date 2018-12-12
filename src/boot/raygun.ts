@@ -1,26 +1,23 @@
-import { Config, UserConfig, assignDefaultConfig } from '../core/config';
-import { UserInfo, User } from '../core/user';
-import { Tags } from '../core/tags';
+import { Core } from '../core/index';
+import { UserConfig } from '../core/config';
+import { UserInfo } from '../core/user';
 
 import { CR } from '../cr/cr';
 import { Public } from './public';
 
 export class Raygun implements Public<Raygun> {
-    private config: Config;
-
-    private user: User;
-
-    private tags: Tags;
+    private core: Core;
 
     private cr: CR;
 
+    constructor() {
+        this.core = new Core();
+    }
+
     boot(userConfig: UserConfig) {
-        this.config = assignDefaultConfig(userConfig);
+        this.core.init(userConfig);
 
-        this.user = new User(this.config);
-        this.tags = new Tags();
-
-        this.cr = new CR(this.config, this.user, this.tags);
+        this.cr = new CR(this.core);
         
         // BOOT RUM
 
@@ -28,12 +25,12 @@ export class Raygun implements Public<Raygun> {
     }
 
     setUser(user: UserInfo) {
-        this.user.setUser(user);
+        this.core.user.setUser(user);
         return this;
     }
 
     withTags(tags: string[]) {
-        this.tags.setTags(tags);
+        this.core.tags.setTags(tags);
         return this;
     }
 

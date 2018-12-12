@@ -6,30 +6,30 @@
 
 interface Report {
     (ex: any): void;
-    subscribe: (handler: () => void) => void;
-    unsubscribe: (handler: () => void) => void;
+    subscribe: (handler: (ex: TraceKitException) => void) => void;
+    unsubscribe: (handler: (ex: TraceKitException) => void) => void;
 }
 
-type TracekitStack = {
+type TraceKitStack = {
     url?: string;
     func?: string;
     line?: number;
     column?: number;
 }
 
-interface TracekitException {
+interface TraceKitException {
     mode: string;
     name: string;
     message: string;
     url: string;
-    stack: TracekitStack;
+    stack: TraceKitStack;
     useragent: string;
     incomplete?: boolean;
 };
 
 interface ComputeStackTrace {
-    (ex: any, depth?: number): TracekitException | undefined;
-    ofCaller: (depth: number) => TracekitException | undefined;
+    (ex: any, depth?: number): TraceKitException | undefined;
+    ofCaller: (depth: number) => TraceKitException | undefined;
     augmentStackTraceWithInitialElement: (stackInfo: any, url: string, lineNo: number, message: string) => boolean;
     guessFunctionName: (url: string, lineNo: number) => string;
     gatherContext: (url: string, lineNo: string) => string[]; 
@@ -1185,4 +1185,4 @@ TraceKit.extendToAsynchronousCallbacks = function () {
     _helper('setInterval');
 };
 
-export { TraceKit, TracekitException };
+export { TraceKit, TraceKitException };
