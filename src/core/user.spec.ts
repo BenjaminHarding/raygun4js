@@ -64,6 +64,7 @@ describe("User", () => {
                 isAnonymous: true
             });
             expect(storage.setMock.mock.calls.length).toBe(1);
+            expect(storage.setMock.mock.calls[0][1]).toBe('abc123');
         });
 
         it("getUser returns a copy of the user payload", () => {

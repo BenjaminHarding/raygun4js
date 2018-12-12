@@ -2,6 +2,7 @@ import { Config, User, Tags } from '../core/index';
 import { CustomData } from './payload';
 import { ProcessedException, ErrorQueue } from './errorQueue';
 import { Transport, sendXHRRequest } from '../utils/transport/index';
+import { TraceKit } from './tracekit';
 
 export class CR {
 
@@ -24,6 +25,19 @@ export class CR {
         this.transport = transport;
 
         this.errorQueue = new ErrorQueue(this.config);
+        this.onWindowError = this.onWindowError.bind(this);
+    }
+
+    public attach() {        
+        TraceKit.report.subscribe(this.onWindowError); // Attach global onerror handler
+
+        if(this.config.asyncErrorHandler) {
+            TraceKit.extendToAsynchronousCallbacks();
+        }
+    }
+
+    public detach() {
+        TraceKit.report.unsubscribe(this.onWindowError);
     }
 
     public send(ex: Error, customData: CustomData, tags: string[]) {
@@ -32,8 +46,13 @@ export class CR {
         }
 
         // Process stack
+        // Process remaining features/functionality
         // Process 'onBeforeSend'
         // Add onto queue
+    }
+
+    public onWindowError() {
+
     }
 
     private get url():string {

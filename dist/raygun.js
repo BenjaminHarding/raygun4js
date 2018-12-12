@@ -13,7 +13,7 @@ define("core/config", ["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     function assignDefaultConfig(userConfig) {
-        return __assign({ realUserMonitoring: false, crashReporting: false, secureCookie: true, saveOfflineErrors: false }, userConfig);
+        return __assign({ realUserMonitoring: false, crashReporting: false, secureCookie: true, saveOfflineErrors: false, apiUrl: "https://api.raygun.io" }, userConfig);
     }
     exports.assignDefaultConfig = assignDefaultConfig;
 });
@@ -258,15 +258,71 @@ define("cr/errorQueue", ["require", "exports", "utils/storage/index"], function 
     }());
     exports.ErrorQueue = ErrorQueue;
 });
-define("cr/cr", ["require", "exports", "cr/errorQueue"], function (require, exports, errorQueue_1) {
+define("utils/transport/transport", ["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.REQUEST_TIMEOUT = 10000;
+    function shouldRetryBasedOnStatus(status) {
+        return status !== 403 && status !== 400 && status !== 429;
+    }
+    exports.shouldRetryBasedOnStatus = shouldRetryBasedOnStatus;
+    function finishTransport(options, status) {
+        if (status === 202) {
+            options.onSuccess();
+        }
+        else {
+            options.onFail(shouldRetryBasedOnStatus(status));
+        }
+    }
+    exports.finishTransport = finishTransport;
+    function failTransport(options) {
+        options.onFail(true);
+    }
+    exports.failTransport = failTransport;
+});
+define("utils/transport/xhr", ["require", "exports", "utils/transport/transport"], function (require, exports, transport_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.sendXHRRequest = function (options) {
+        var xhr = new XMLHttpRequest();
+        xhr.open(options.method, options.url, true);
+        xhr.timeout = transport_1.REQUEST_TIMEOUT;
+        xhr.setRequestHeader('Content-Type', 'text/plain;charset=UTF-8');
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState !== 4) {
+                return;
+            }
+            transport_1.finishTransport(options, xhr.status);
+        };
+        xhr.onerror = function () {
+            transport_1.failTransport(options);
+        };
+        xhr.ontimeout = function () {
+            transport_1.failTransport(options);
+        };
+        xhr.send(JSON.stringify(options.data));
+    };
+});
+define("utils/transport/index", ["require", "exports", "utils/transport/transport", "utils/transport/xhr"], function (require, exports, transport_2, xhr_1) {
+    "use strict";
+    function __export(m) {
+        for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
+    }
+    Object.defineProperty(exports, "__esModule", { value: true });
+    __export(transport_2);
+    __export(xhr_1);
+});
+define("cr/cr", ["require", "exports", "cr/errorQueue", "utils/transport/index"], function (require, exports, errorQueue_1, index_3) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var CR = (function () {
-        function CR(config, user, tags) {
+        function CR(config, user, tags, transport) {
+            if (transport === void 0) { transport = index_3.sendXHRRequest; }
             this.sending = false;
             this.config = config;
             this.user = user;
             this.tags = tags;
+            this.transport = transport;
             this.errorQueue = new errorQueue_1.ErrorQueue(this.config);
         }
         CR.prototype.send = function (ex, customData, tags) {
@@ -274,7 +330,15 @@ define("cr/cr", ["require", "exports", "cr/errorQueue"], function (require, expo
                 return;
             }
         };
+        Object.defineProperty(CR.prototype, "url", {
+            get: function () {
+                return this.config.apiUrl + "/entries?apikey=" + encodeURIComponent(this.config.apiKey);
+            },
+            enumerable: true,
+            configurable: true
+        });
         CR.prototype.postNextError = function () {
+            var _this = this;
             if (this.sending) {
                 return;
             }
@@ -284,15 +348,21 @@ define("cr/cr", ["require", "exports", "cr/errorQueue"], function (require, expo
                 this.sending = false;
                 return;
             }
-            var success = false;
-            if (success) {
-                this.sending = false;
-                this.postNextError();
-            }
-            else {
-                this.errorQueue.add(error, true);
-                this.sending = false;
-            }
+            this.transport({
+                method: 'post',
+                url: this.url,
+                data: error,
+                onSuccess: function () {
+                    _this.sending = false;
+                    _this.postNextError();
+                },
+                onFail: function (retry) {
+                    if (retry) {
+                        _this.errorQueue.add(error, true);
+                    }
+                    _this.sending = false;
+                }
+            });
         };
         return CR;
     }());

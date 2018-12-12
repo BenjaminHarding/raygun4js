@@ -8,6 +8,7 @@ export type OptionalConfig = {
     secureCookie: boolean;
     saveOfflineErrors: boolean;
     apiUrl: string;
+    asyncErrorHandler: boolean;
 };
 
 export type Config = RequiredConfig & OptionalConfig;
@@ -20,6 +21,7 @@ export function assignDefaultConfig(userConfig: UserConfig): Config {
         crashReporting: false,
         secureCookie: true,
         saveOfflineErrors: false,
+        asyncErrorHandler: false,
         apiUrl: "https://api.raygun.io",
         ...userConfig
     };
