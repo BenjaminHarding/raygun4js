@@ -7,7 +7,7 @@ const CLIENT_NAME = 'raygun-js';
 
 const CLIENT_VERSION = 'test';
 
-export function createPayload(core: Core, exception: TraceKitException, tags: string[] = [], customData: CustomData = {}): Payload {
+export function createPayload(core: Core, exception: TraceKitException, customData: CustomData, tags: string[]): Payload {
     const payload: Payload = {
         OccurredOn: new Date(),
         Details: {

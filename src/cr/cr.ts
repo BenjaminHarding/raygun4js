@@ -1,5 +1,5 @@
 import { Core } from '../core/index';
-import { Transport, sendXHRRequest } from '../utils/transport';
+import { Transport, sendXHRRequest } from '../utils/transport/index';
 
 import { CustomData } from './payload';
 import { ProcessedException, ErrorQueue } from './errorQueue';
@@ -42,7 +42,6 @@ export class CR {
             return;
         }
 
-        // Process stack
         const exception = TraceKit.computeStackTrace(ex);
         this.processException(exception, customData, tags);
     }
@@ -52,7 +51,13 @@ export class CR {
             return;
         }
 
-        const payload = createPayload(this.core, ex);
+        const payload = createPayload(this.core, ex, customData, tags);
+        this.errorQueue.add({
+            url: this.url,
+            apiKey: this.core.config.apiKey,
+            payload,
+        } as ProcessedException);
+        this.postNextError();
     }   
 
     private get url():string {
@@ -74,8 +79,8 @@ export class CR {
 
         this.transport({
             method: 'post',
-            url: this.url,
-            data: error,
+            url: error.url,
+            data: error.payload,
             onSuccess: () => {
                 this.sending = false;
                 this.postNextError();
@@ -88,5 +93,4 @@ export class CR {
             }
         });
     }
-
 }
