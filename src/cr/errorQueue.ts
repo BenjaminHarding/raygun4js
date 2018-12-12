@@ -1,6 +1,6 @@
 import { Config } from '../core/index';
 import { Storage, LocalStorage } from '../utils/storage/index';
-import { Payload } from './payload';
+import { Payload } from './models';
 
 export type ProcessedException = {
     url: string;

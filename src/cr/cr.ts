@@ -1,10 +1,10 @@
-import { Core } from '../core/index';
-import { Transport, sendXHRRequest } from '../utils/transport/index';
+import { Core } from '../core';
+import { Transport, sendXHRRequest } from '../utils/transport';
 
-import { CustomData } from './payload';
+import { CustomData } from './models';
 import { ProcessedException, ErrorQueue } from './errorQueue';
 import { discardError } from './discardError';
-import { createPayload } from './createPayload';
+import { createPayload } from './payload';
 import { TraceKit, TraceKitException } from './tracekit';
 
 export class CR {
@@ -58,7 +58,7 @@ export class CR {
             payload,
         } as ProcessedException);
         this.postNextError();
-    }   
+    }
 
     private get url():string {
         return `${this.core.config.apiUrl}/entries?apikey=${encodeURIComponent(this.core.config.apiKey)}`;

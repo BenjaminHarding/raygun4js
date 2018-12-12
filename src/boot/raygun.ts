@@ -2,7 +2,7 @@ import { Core } from '../core/index';
 import { UserConfig } from '../core/config';
 import { UserInfo } from '../core/user';
 
-import { CR } from '../cr/cr';
+import { CR, CustomData } from '../cr/index';
 import { Public } from './public';
 
 export class Raygun implements Public<Raygun> {
@@ -32,6 +32,10 @@ export class Raygun implements Public<Raygun> {
     withTags(tags: string[]) {
         this.core.tags.setTags(tags);
         return this;
+    }
+
+    send(error: Error, customData: CustomData={}, tags: string[]=[]) {
+        this.cr.send(error, customData, tags);
     }
 
     static noConflict() {
