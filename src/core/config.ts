@@ -2,16 +2,21 @@ type RequiredConfig = {
     apiKey: string;
 };
 
-export type OptionalConfig = {
+export type CrashReportingConfig = {
     crashReporting: boolean;
-    realUserMonitoring: boolean;
-    secureCookie: boolean;
     saveOfflineErrors: boolean;
-    apiUrl: string;
     asyncErrorHandler: boolean;
-    ignore3rdPartyErrors: boolean;
+    captureUnhandledRejections: boolean;
+    // TODO
     excludedHostnames: string[];
     excludedUserAgents: string[];
+    ignore3rdPartyErrors: boolean;
+};
+
+export type OptionalConfig = CrashReportingConfig & {
+    realUserMonitoring: boolean;
+    secureCookie: boolean;
+    apiUrl: string;
     attachHandlers: boolean;
 };
 
@@ -21,16 +26,20 @@ export type UserConfig = RequiredConfig & Partial<OptionalConfig>;
 
 export function assignDefaultConfig(userConfig: UserConfig): Config {
     return {
-        realUserMonitoring: false,
-        crashReporting: false,
+        // GENERAL
         secureCookie: true,
+        apiUrl: "https://api.raygun.io",
+        attachHandlers: true,
+        // CR
+        crashReporting: false,
         saveOfflineErrors: false,
-        asyncErrorHandler: false,
+        asyncErrorHandler: true,
         ignore3rdPartyErrors: false,
         excludedHostnames: [],
         excludedUserAgents: [],
-        apiUrl: "https://api.raygun.io",
-        attachHandlers: true,
+        captureUnhandledRejections: true,
+        // RUM
+        realUserMonitoring: false,
         ...userConfig
     };
 }

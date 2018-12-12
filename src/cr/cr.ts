@@ -1,5 +1,5 @@
-import { Core } from '../core';
-import { Transport, sendXHRRequest } from '../utils/transport';
+import { Core } from '../core/index';
+import { Transport, sendXHRRequest } from '../utils/transport/index';
 
 import { CustomData } from './models';
 import { ProcessedException, ErrorQueue } from './errorQueue';
@@ -22,26 +22,56 @@ export class CR {
         this.transport = transport;
 
         this.errorQueue = new ErrorQueue(this.core.config);
-        this.processException = this.processException.bind(this);
+        this.sendWindowException = this.sendWindowException.bind(this);
+        this.sendPromiseException = this.sendPromiseException.bind(this);
     }
 
     public attach() {        
-        TraceKit.report.subscribe(this.processException); // Attach global onerror handler
+        TraceKit.report.subscribe(this.sendWindowException); // Attach global onerror handler
 
         if(this.core.config.asyncErrorHandler) {
             TraceKit.extendToAsynchronousCallbacks();
         }
+        if(this.core.config.captureUnhandledRejections) {
+            window.addEventListener('unhandledrejection', this.sendPromiseException);
+        }
     }
 
     public detach() {
-        TraceKit.report.unsubscribe(this.processException);
+        TraceKit.report.unsubscribe(this.sendWindowException);
+        window.removeEventListener('unhandledrejection', this.sendPromiseException);
     }
 
     public send(ex: Error, customData: CustomData, tags: string[]) {
         if(!this.core.config.crashReporting) {
             return;
         }
+        this.sendInternal(ex,customData,tags);
+    }
 
+    private sendWindowException(ex: TraceKitException) {
+        this.processException(ex, {}, ['UnhandledException']);
+    }
+
+    private sendPromiseException(event: PromiseRejectionEvent) {
+        let error = event.reason;
+
+        if(!error && (event as any).detail && (event as any).detail.reason) {
+            error = (event as any).detail.reason;
+        }
+
+        if(!(error instanceof Error) && event.reason && event.reason.error) {
+            error = event.reason.error;
+        }
+
+        if(!error) {
+            error = event;
+        }
+
+        this.sendInternal(error, {}, ['UnhandledPromiseRejection']);
+    }
+
+    private sendInternal(ex: Error, customData: CustomData, tags: string[]) {
         const exception = TraceKit.computeStackTrace(ex);
         this.processException(exception, customData, tags);
     }
