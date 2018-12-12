@@ -2,11 +2,9 @@ import { Core, Config } from '../core';
 import { TraceKitException } from './tracekit';
 
 export function discardError(core: Core, exception: TraceKitException): boolean {
-    return checks.every(shouldDiscard => !shouldDiscard(core.config, exception));
+    return checks.every(discard => discard(core.config, exception));
 }
 
-// true = error is allowed through
-// false =  error shouldn't be reported
 type DiscardErrorCheck = (config: Config, exception: TraceKitException) => boolean;
 
 export const discardAsThirdPartyError: DiscardErrorCheck = (config, exception) => {
@@ -14,7 +12,7 @@ export const discardAsThirdPartyError: DiscardErrorCheck = (config, exception) =
         return false;
     }
     // TODO
-    return true;
+    return false;
 }
 
 export const discardAsAnExcludedHostname: DiscardErrorCheck = (config, exception) => {
@@ -30,7 +28,7 @@ export const discardAsAnExcludedUserAgent: DiscardErrorCheck = (config, exceptio
 }
 
 export const discardAsTheInsightsCrawler: DiscardErrorCheck = () => {
-    return navigator.userAgent.match('RaygunPulseInsightsCrawler').length > 0;
+    return navigator.userAgent.indexOf('RaygunPulseInsightsCrawler') > -1;
 }
 
 const checks: DiscardErrorCheck[] = [

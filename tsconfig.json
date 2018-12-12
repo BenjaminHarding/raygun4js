@@ -3,12 +3,13 @@
         "allowJs": false,
         "build": true,
         "removeComments": true,
-        //"noImplicitAny": true, // Need to fix tracekit file before we can enable this setting
+        "noImplicitAny": false, // Need to fix tracekit file before we can enable this setting
         "strictPropertyInitialization": false,
         "target": "es5",
         "outDir": "./dist/",
         "module": "es2015",
         "allowSyntheticDefaultImports": true,
+        "esModuleInterop": true,
         "sourceMap": true,
     },
     "include": [

@@ -5,6 +5,7 @@ module.exports = function(env, argv) {
 
     return {
         mode: argv.mode,
+        devtool: "none",
         entry: {
             raygun: './src/boot/raygun.ts',
             cr: './src/boot/cr.ts'

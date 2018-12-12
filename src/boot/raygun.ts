@@ -36,9 +36,12 @@ export class Raygun implements Public<Raygun> {
 
     send(error: Error, customData: CustomData={}, tags: string[]=[]) {
         this.cr.send(error, customData, tags);
+        return this;
     }
 
     static noConflict() {
         return new Raygun();
     }
 }
+
+(window as any).Raygun = new Raygun();

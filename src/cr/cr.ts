@@ -23,6 +23,8 @@ export class CR {
 
         this.errorQueue = new ErrorQueue(this.core.config);
         this.processException = this.processException.bind(this);
+
+        this.attach();
     }
 
     public attach() {        

@@ -5,7 +5,7 @@ import { UserInfo } from '../core/user';
 import { CR, CustomData } from '../cr';
 import { Public } from './public';
 
-export class CrashReporting implements Public<CrashReporting> {
+export class RaygunCrashReporting implements Public<RaygunCrashReporting> {
     private core: Core;
 
     private cr: CR;
@@ -35,6 +35,8 @@ export class CrashReporting implements Public<CrashReporting> {
     }
 
     static noConflict() {
-        return new CrashReporting();
+        return new RaygunCrashReporting();
     }
 }
+
+(window as any).Raygun = new RaygunCrashReporting();

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Raygun Crash Reporting - Basic Example</title>
+
+    <script src="../dist/raygun.js"></script>
+</head>
+<body>
+
+<div class="container">
+    <div class="header clearfix">
+        <br>
+    </div>
+
+    <div class="jumbotron">
+        <h1 class="text-center">Raygun4JS - Basic Example</h1>
+
+
+        <p class="text-center">
+            <a class="btn btn-lg btn-success" href="#" id="ErrorButton" role="button">
+                Throw an error
+            </a>
+        </p>
+    </div>
+</div>
+
+<script type="text/javascript">
+    Raygun.boot({
+        apiKey: 'VOMXJoRFCa8NIUJbcM5Edw',
+        crashReporting: true,
+    })
+    .withTags(['test'])
+    .setUser({
+        identifier: '1',
+        isAnonymous: false
+    });
+</script>
+
+<script type="text/javascript">
+    document.getElementById('ErrorButton').addEventListener('click', function() {
+        bob.GetMessage();
+    });
+</script>
+
+</body>
+</html>
