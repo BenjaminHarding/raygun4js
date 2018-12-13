@@ -1,4 +1,4 @@
-import { Core, Config } from '../core';
+import { Core } from '../core';
 import { TraceKitException, TraceKitStack } from './tracekit';
 import { Payload, Environment, Request, CustomData, Error, StackTrace } from './models';
 import { getQuery } from '../utils/url';
@@ -95,9 +95,9 @@ export function createEnvironment(): Environment {
         'Document-Mode': (document as any).documentMode, 
         'Browser-Width': window.innerWidth || document.documentElement.clientWidth,
         'Browser-Height': window.innerHeight || document.documentElement.clientHeight,
-        'Screen-Width': screen ? window.screen.width : document.documentElement.clientWidth,
-        'Screen-Height': screen ? window.screen.height : document.documentElement.clientHeight,
-        'Color-Depth': screen ? window.screen.colorDepth : 8,
+        'Screen-Width': window.screen ? window.screen.width : document.documentElement.clientWidth,
+        'Screen-Height': window.screen ? window.screen.height : document.documentElement.clientHeight,
+        'Color-Depth': window.screen ? window.screen.colorDepth : 8,
         Browser: navigator.appCodeName,
         'Browser-Name': navigator.appName,
         'Browser-Version': navigator.appVersion,
