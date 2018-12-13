@@ -24,22 +24,26 @@ export type Config = RequiredConfig & OptionalConfig;
 
 export type UserConfig = RequiredConfig & Partial<OptionalConfig>;
 
+export const defaultOptionalConfig: OptionalConfig = {
+    // GENERAL
+    secureCookie: true,
+    apiUrl: "https://api.raygun.io",
+    attachHandlers: true,
+    // CR
+    crashReporting: false,
+    saveOfflineErrors: false,
+    asyncErrorHandler: true,
+    ignore3rdPartyErrors: false,
+    excludedHostnames: [],
+    excludedUserAgents: [],
+    captureUnhandledRejections: true,
+    // RUM
+    realUserMonitoring: false,
+};
+
 export function assignDefaultConfig(userConfig: UserConfig): Config {
     return {
-        // GENERAL
-        secureCookie: true,
-        apiUrl: "https://api.raygun.io",
-        attachHandlers: true,
-        // CR
-        crashReporting: false,
-        saveOfflineErrors: false,
-        asyncErrorHandler: true,
-        ignore3rdPartyErrors: false,
-        excludedHostnames: [],
-        excludedUserAgents: [],
-        captureUnhandledRejections: true,
-        // RUM
-        realUserMonitoring: false,
+        ...defaultOptionalConfig,
         ...userConfig
     };
 }

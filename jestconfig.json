@@ -2,7 +2,9 @@
     "transform": {
       "^.+\\.(t|j)sx?$": "ts-jest"
     },
-    "setupFiles": [],
+    "setupFiles": [      
+      "<rootDir>/src/tests/setup.ts"
+    ],
     "testEnvironment": "jsdom",
     "roots":  [
       "<rootDir>/src/"
