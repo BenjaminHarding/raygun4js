@@ -27,8 +27,8 @@ export const discardAsAnExcludedUserAgent: DiscardErrorCheck = (config, exceptio
     return false;
 }
 
-export const discardAsTheInsightsCrawler: DiscardErrorCheck = (config, exception, userAgent: string=navigator.userAgent) => {
-    return userAgent.indexOf('RaygunPulseInsightsCrawler') > -1;
+export const discardAsTheInsightsCrawler: DiscardErrorCheck = () => {
+    return navigator.userAgent.indexOf('RaygunPulseInsightsCrawler') > -1;
 }
 
 const checks: DiscardErrorCheck[] = [

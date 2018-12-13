@@ -8,14 +8,14 @@ export type ProcessedException = {
     payload: Payload;
 };
 
-const ERROR_STORAGE_KEY = "raygun4js-errors";
+export const ERROR_STORAGE_KEY = "raygun4js-errors";
 
 export class ErrorQueue {
     private config: Config;
     private storage: Storage<ProcessedException[]>;
 
     private errorQueue: ProcessedException[] = [];
-    
+
     constructor(config: Config, storage: Storage<ProcessedException[]>=new LocalStorage()) {
         this.storage = storage;
         this.config = config;
@@ -30,7 +30,7 @@ export class ErrorQueue {
 
         const errors = this.storage.read(ERROR_STORAGE_KEY);
 
-        if(errors){
+        if(errors) {
             this.errorQueue = errors.filter(e => e.apiKey === this.config.apiKey);
         }
     }
@@ -40,7 +40,7 @@ export class ErrorQueue {
             return;
         }
 
-        this.storage.set(ERROR_STORAGE_KEY, this.errorQueue);
+        this.storage.set(ERROR_STORAGE_KEY, [ ...this.errorQueue ]);
     }
 
     public add(error: ProcessedException, addToStart?: boolean) {
